@@ -10,11 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout Device Tree
-        uses: actions/checkout@v4
-        with:
-          path: device/samsung/a05
-
       - name: Setup Build Environment
         run: |
           sudo apt-get update
@@ -36,18 +31,28 @@ jobs:
           repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
           repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j$(nproc --all)
 
-      - name: Prepare Device Tree in Tree Root
+      - name: Clone Device Tree
         run: |
-          mkdir -p ~/twrp/device/samsung/a05
-          cp -r $GITHUB_WORKSPACE/device/samsung/a05/* ~/twrp/device/samsung/a05/
-          ls -la ~/twrp/device/samsung/a05/
+          cd ~/twrp
+          git clone https://github.com/${{ github.repository }}.git -b ${{ github.ref_name }} device/samsung/a05
+          ls -la device/samsung/a05
+
+      - name: Prepare Dummy Kernel Fallback If Missing
+        run: |
+          mkdir -p ~/twrp/device/samsung/a05/prebuilt
+          if [ ! -f ~/twrp/device/samsung/a05/prebuilt/kernel ]; then
+            touch ~/twrp/device/samsung/a05/prebuilt/kernel
+          fi
+          if [ ! -f ~/twrp/device/samsung/a05/prebuilt/dtb.img ]; then
+            touch ~/twrp/device/samsung/a05/prebuilt/dtb.img
+          fi
 
       - name: Compile TWRP Recovery Image
         run: |
           cd ~/twrp
           source build/envsetup.sh
           export ALLOW_MISSING_DEPENDENCIES=true
-          lunch omni_a05-eng
+          lunch twrp_a05-eng || lunch omni_a05-eng
           mka recoveryimage -j$(nproc --all)
 
       - name: Package Odin Tar Archive
