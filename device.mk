@@ -6,7 +6,8 @@ PRODUCT_TARGET_VNDK_VERSION := 31
 
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/init.recovery.mt6769.rc:recovery/root/init.recovery.mt6769.rc \
-    $(DEVICE_PATH)/recovery/root/etc/recovery.fstab:recovery/root/system/etc/recovery.fstab
+    $(DEVICE_PATH)/recovery/root/etc/recovery.fstab:recovery/root/system/etc/recovery.fstab \
+    $(DEVICE_PATH)/recovery/root/etc/recovery.fstab:recovery/root/etc/recovery.fstab
 
 PRODUCT_PACKAGES += \
     fastbootd \

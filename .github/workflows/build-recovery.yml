@@ -47,12 +47,23 @@ jobs:
             touch ~/twrp/device/samsung/a05/prebuilt/dtb.img
           fi
 
+      - name: Patch Build Rules and Exclude Conflicts
+        run: |
+          cd ~/twrp
+          sed -i 's/rsync -a /rsync -a --force /g' build/make/core/Makefile 2>/dev/null || true
+          sed -i 's/--exclude=cache/--exclude=cache --exclude=\/root\/vendor --exclude=\/root\/product --exclude=\/root\/system_ext --exclude=\/root\/odm/g' build/make/core/Makefile 2>/dev/null || true
+          if [ -d bootable/recovery ]; then
+            sed -i 's/rsync -a /rsync -a --force /g' $(grep -rl "rsync -a" bootable/recovery/ 2>/dev/null || true) 2>/dev/null || true
+          fi
+          rm -rf out/target/product/a05/recovery/root/vendor 2>/dev/null || true
+
       - name: Compile TWRP Recovery Image
         run: |
           cd ~/twrp
           source build/envsetup.sh
           export ALLOW_MISSING_DEPENDENCIES=true
           lunch twrp_a05-eng || lunch omni_a05-eng
+          rm -rf out/target/product/a05/recovery/root/vendor 2>/dev/null || true
           mka recoveryimage -j$(nproc --all)
 
       - name: Package Odin Tar Archive
