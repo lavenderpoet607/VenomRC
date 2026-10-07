@@ -38,7 +38,9 @@ jobs:
 
       - name: Prepare Device Tree in Tree Root
         run: |
-          cp -r $GITHUB_WORKSPACE/device/samsung/a05 ~/twrp/device/samsung/
+          mkdir -p ~/twrp/device/samsung/a05
+          cp -r $GITHUB_WORKSPACE/device/samsung/a05/* ~/twrp/device/samsung/a05/
+          ls -la ~/twrp/device/samsung/a05/
 
       - name: Compile TWRP Recovery Image
         run: |
