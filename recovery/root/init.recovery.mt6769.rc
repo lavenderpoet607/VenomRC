@@ -1,0 +1,46 @@
+on early-init
+    setprop sys.usb.configfs 1
+
+on init
+    setprop sys.usb.ffs.aio_compat 1
+    export ANDROID_ROOT /system_root
+
+on fs
+    wait /dev/block/platform/bootdevice
+    wait /dev/block/by-name/metadata
+    mount ext4 /dev/block/by-name/metadata /metadata noatime nosuid nodev
+
+on post-fs
+    start boot-hal-1-2
+
+on boot
+    setprop sys.usb.config adb
+
+on property:ro.boot.usbcontroller=*
+    setprop sys.usb.controller ${ro.boot.usbcontroller}
+
+on property:sys.usb.config=adb && property:sys.usb.configfs=1
+    start adbd
+
+on property:sys.usb.ffs.ready=1 && property:sys.usb.config=adb && property:sys.usb.configfs=1
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb"
+    rm /config/usb_gadget/g1/configs/b.1/f1
+    rm /config/usb_gadget/g1/configs/b.1/f2
+    write /config/usb_gadget/g1/idVendor 0x04e8
+    write /config/usb_gadget/g1/idProduct 0x6860
+    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:sys.usb.config=fastboot && property:sys.usb.configfs=1
+    start fastbootd
+
+on property:sys.usb.ffs.ready=1 && property:sys.usb.config=fastboot && property:sys.usb.configfs=1
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "fastboot"
+    rm /config/usb_gadget/g1/configs/b.1/f1
+    rm /config/usb_gadget/g1/configs/b.1/f2
+    write /config/usb_gadget/g1/idVendor 0x04e8
+    write /config/usb_gadget/g1/idProduct 0x6860
+    symlink /config/usb_gadget/g1/functions/ffs.fastboot /config/usb_gadget/g1/configs/b.1/f1
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
