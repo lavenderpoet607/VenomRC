@@ -1,8 +1,8 @@
 DEVICE_PATH := device/samsung/a05
 
 ENABLE_VIRTUAL_AB := false
-PRODUCT_SHIPPING_API_LEVEL := 34
-PRODUCT_TARGET_VNDK_VERSION := 34
+PRODUCT_SHIPPING_API_LEVEL := 31
+PRODUCT_TARGET_VNDK_VERSION := 31
 
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/init.recovery.mt6769.rc:recovery/root/init.recovery.mt6769.rc \
