@@ -10,3 +10,5 @@ PRODUCT_BRAND := samsung
 PRODUCT_MODEL := SM-A055F
 PRODUCT_MANUFACTURER := samsung
 PRODUCT_GMS_CLIENTID_BASE := android-samsung
+
+TW_THEME := portrait_hdpi
